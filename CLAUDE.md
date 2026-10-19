@@ -2,7 +2,7 @@
 
 An all-in-one jazz piano practice app (formerly called Woodshed) built around a smart 15-minute daily warm-up. It decides what Ganesh should practise each day across all 12 keys, then tracks how it went.
 
-The current version is a single self-contained `index.html` (vanilla JS, no build step). It was prototyped in Claude and is the source of truth for behaviour. The planned next step is a port to React + Vite as a PWA (see "Roadmap").
+It is a React + Vite PWA (installable, works offline), deployed on Vercel. It was ported from a single-file vanilla-JS prototype, which is kept in `prototype/index.html` as the behavioural reference: `tests/parity.test.js` checks the ported theory engine and scheduler against it.
 
 ## The name
 Guide tones are the 3rd and 7th: the two notes that define a chord and lead smoothly into the next. The app is built around them (shell voicings, guide-tone lines down the circle), and its job is to guide what Ganesh practises each day.
@@ -16,8 +16,9 @@ Guide tones are the 3rd and 7th: the two notes that define a chord and lead smoo
 
 ## Running and testing
 
-- Open `index.html` in a browser. Nothing to install.
-- `node tests/theory.test.mjs` runs regression checks on the theory engine and scheduler. The app exposes its pure functions on `globalThis.__WS` so the test can run the inline script headless. Keep that export working (or the equivalent module exports after the port) and keep these tests passing.
+- `npm install`, then `npm run dev` for a local server with hot reload (StackBlitz runs this automatically). `npm run build` produces `dist/`; `npm run preview` serves it with the service worker on.
+- `npm test` runs Vitest: `tests/theory.test.js` (regression checks on the theory engine and scheduler) and `tests/parity.test.js` (runs the prototype's inline script headless via its `globalThis.__WS` export and compares spellings, voicings, curricula, reading scores and daily plans with the ported modules). Keep both passing. If behaviour is changed on purpose, the parity test will flag it: update or retire the relevant check rather than the prototype.
+- Vercel: import the repo and it builds with the defaults in `vercel.json` (`npm run build` → `dist`). Pushes to `main` redeploy.
 - Progress is stored in `localStorage` under `guidetone.v1` (it falls back to reading the older `woodshed.v1` key from the prototype). Settings → "Back up your progress" gives a JSON blob that can be pasted into Restore on another origin.
 
 ## Product shape
@@ -63,12 +64,19 @@ Item ids are `<prefix>:<sub>:<pitch-class>` (pitch class 0 = C … 11 = B), exce
 - Chords drill **qualities and extensions**, not a catalogue of voicings.
 - Rhythm-reading attempts suggest a 1–10 score from hit rate, timing error and extra taps.
 
+### Code layout
+- `src/theory/`: notes and spelling (`notes.js`), `QUAL`, chords in a key (`chords.js`), `TECH`, `CYC`/`QZ`, `SCALE`/`PAT`, rhythm drills, and voicing. Pure functions only.
+- `src/engine/`: the item catalogue and curricula, storage (`store.js` holds `state`), scores, `review`, the planner, the mixed-reharm unlock, quiz weighting and reading evaluation.
+- `src/audio/`: the synth and the look-ahead metronome.
+- `src/components/`: shared widgets (`common.jsx`: keyboard, bars, folds, rate row, metronome strip, circle) and `cards/`, one component per card type. `src/views/` holds the six screens.
+- `src/ui.js` holds screen state that isn't saved (`UI`: view, the live card's scratch state, library selection). Handlers mutate `state`/`UI` and call `render()`, which re-renders the app, just as the prototype did. A new card gets fresh `UI.card` state when the item changes.
+
 ### Visual design
-Tokens are defined on `:root` with dark-mode overrides. Fonts: Big Shoulders Display (display), Instrument Sans (body) and IBM Plex Mono (data). Accent is a cobalt blue. Keep the existing look when porting.
+Tokens are defined on `:root` with dark-mode overrides. Fonts: Big Shoulders Display (display), Instrument Sans (body) and IBM Plex Mono (data). Accent is a cobalt blue. Keep the existing look. The styles live in `src/styles.css`, unchanged from the prototype.
 
 ## Roadmap
 
-1. **Port to React + Vite PWA** (installable, offline via a service worker), deployable on Vercel. Split the script into modules: `theory/` (spell, QUAL, TECH, CYC, SCALE, voicing), `engine/` (planner, review, storage), `audio/` (synth + metronome scheduler), and `components/` per card type. Behaviour and copy should match the prototype; port `tests/theory.test.mjs` to Vitest.
+1. ~~Port to React + Vite PWA~~ (done: see "Code layout").
 2. Supabase sync of `state`, so progress follows Ganesh across devices.
 3. Proper rhythm notation for reading drills, which currently use a counting grid.
 4. Optional Web MIDI input to auto-check chords and timing (Chrome/Edge only; keep self-rating as the default).
