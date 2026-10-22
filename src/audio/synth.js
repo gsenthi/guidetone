@@ -3,7 +3,12 @@ import {state} from '../engine/store.js';
 
 /* A simple Web Audio synth: triangle + octave sine through a closing low-pass, and short oscillator clicks. */
 export let ctx=null,master=null,active=[];
-export function audio(){if(!ctx){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;ctx=new AC();const comp=ctx.createDynamicsCompressor();master=ctx.createGain();master.gain.value=.8;master.connect(comp);comp.connect(ctx.destination);}if(ctx.state==='suspended')ctx.resume();return ctx;}
+export function audio(){if(!ctx){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;
+    // iOS: play like a music app, so the ring/silent switch doesn't mute the metronome.
+    try{if(navigator.audioSession)navigator.audioSession.type='playback';}catch(e){}
+    ctx=new AC();const comp=ctx.createDynamicsCompressor();master=ctx.createGain();master.gain.value=.8;master.connect(comp);comp.connect(ctx.destination);}
+  // 'suspended' until the first tap; 'interrupted' on iOS after locking the screen, switching apps or a call.
+  if(ctx.state!=='running')ctx.resume().catch(()=>{});return ctx;}
 export const mtof=m=>440*Math.pow(2,(m-69)/12);
 export function pianoNote(m,t,dur=1.4,vel=.5){const c=ctx;const g=c.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vel*.22,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
   const f=c.createBiquadFilter();f.type='lowpass';f.frequency.setValueAtTime(3000,t);f.frequency.exponentialRampToValueAtTime(700,t+dur);
