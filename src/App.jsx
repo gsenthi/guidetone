@@ -1,4 +1,5 @@
-import {useEffect,useSyncExternalStore} from 'react';
+import {useEffect,useLayoutEffect,useSyncExternalStore} from 'react';
+import {state} from './engine/store.js';
 import {UI,subscribe,getVersion,go} from './ui.js';
 import {Today} from './views/Today.jsx';
 import {Session,Summary} from './views/Session.jsx';
@@ -10,6 +11,7 @@ const VIEWS={today:Today,session:Session,summary:Summary,library:Library,progres
 const TABS=[['today','Today'],['library','Library'],['progress','Progress'],['settings','Settings']];
 
 export function App(){useSyncExternalStore(subscribe,getVersion);
+  useLayoutEffect(()=>{document.documentElement.dataset.look=state.settings.look||'colour';});
   /* Space bar taps along in rhythm reading. */
   useEffect(()=>{const onKey=e=>{if(UI.view==='session'&&UI.read.phase==='run'&&(e.code==='Space'||e.key===' ')){e.preventDefault();UI.read.tapFn&&UI.read.tapFn();}};document.addEventListener('keydown',onKey);return()=>document.removeEventListener('keydown',onKey);},[]);
   const View=VIEWS[UI.view];const tabView=UI.view==='session'||UI.view==='summary'?'today':UI.view;

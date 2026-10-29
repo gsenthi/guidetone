@@ -74,6 +74,8 @@ Item ids are `<prefix>:<sub>:<pitch-class>` (pitch class 0 = C … 11 = B), exce
 ### Visual design
 Tokens are defined on `:root` with dark-mode overrides. Fonts: Big Shoulders Display (display), Instrument Sans (body) and IBM Plex Mono (data). Accent is a cobalt blue. Keep the existing look. The styles live in `src/styles.css`, unchanged from the prototype.
 
+Settings → Look also offers **Black & white** (`settings.look: 'mono'`, applied as `data-look="mono"` on `<html>`): white page, black ink, Helvetica, square corners, no colour. Where colour carried meaning it is replaced, not dropped: mastery squares fill from the bottom (¼ for 1–3 up to solid for 9–10), played keys get a solid name tag, quiz answers are solid (right) or struck through (wrong), and reading taps are solid / hollow / crossed squares. Any new colour-coded UI needs a black-and-white equivalent in the `[data-look="mono"]` block at the end of `styles.css`.
+
 ## Roadmap
 
 1. ~~Port to React + Vite PWA~~ (done: see "Code layout").
