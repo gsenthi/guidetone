@@ -19,7 +19,7 @@ Guide Tone gives you a focused 15-minute warm-up every day. It picks a key of th
 | Area | What it drills |
 |---|---|
 | **Rhythm & time** | Time feel against the metronome (click on 2 and 4, beat 4 only, bar on/bar off…), subdivisions and polyrhythms, and tap-along rhythm reading scored against the grid |
-| **Circle of 5ths** | Dominant 7ths round the circle, guide tones down the circle, ii–V–I down the circle, diatonic cycles in major and minor, and a 60-second recall quiz to open each session |
+| **Circle of 5ths** | Dominant 7ths round the circle, guide tones down the circle, ii–V–I and backdoor ii–V–I down the circle, diatonic cycles in major and minor, and a 60-second recall quiz to open each session |
 | **Scales & speed** | 13 scales, from major and the modes to bebop, altered and diminished, each with its own tempo ladder |
 | **Patterns & lines** | Digital patterns and enclosures over a ii–V–I |
 | **Chords & extensions** | 25 chord qualities (maj9, 6/9, 13, sus, 7alt, 9♯11…): spell it, then play root and guide tone in the left hand and colour tones in the right |

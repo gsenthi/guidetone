@@ -1,7 +1,8 @@
 // Regression checks for Guide Tone's theory engine and scheduler.
 // Run with: npm test
 import {describe,it,expect} from 'vitest';
-import {QUAL,TECH,degLabel,scaleNotes,twoHand,barsInKey,voiceTexture} from '../src/theory/index.js';
+import {QUAL,TECH,degLabel,scaleNotes,twoHand,barsInKey,voiceTexture,cycleChain,cyclePath} from '../src/theory/index.js';
+import {CURR} from '../src/engine/catalogue.js';
 import {state} from '../src/engine/store.js';
 import {review} from '../src/engine/review.js';
 import {makePlan} from '../src/engine/planner.js';
@@ -45,6 +46,16 @@ describe('theory engine',()=>{
       expect(move,`step ${i} moved ${move} semitones`).toBeLessThanOrEqual(2);
     }
   });
+
+  it('backdoor ii–V–I down the circle: iv–♭VII7–I, a 5th lower each time',()=>{
+    const syms=cycleChain('bdiiV',0).map(c=>c.sym);
+    expect(syms.slice(0,6)).toEqual(['Fm7','B♭7','Cmaj7','B♭m7','E♭7','Fmaj7']);
+    expect(syms.length).toBe(18);
+    expect(cyclePath('bdiiV',0).join(' ')).toBe('C F B♭ E♭ A♭ D♭');
+    // the ♭6 of the key (3rd of iv) falls a semitone to the 5th of I
+    const [iv,,I]=voiceTexture(cycleChain('bdiiV',0).slice(0,3),'rootless');
+    expect(iv.some(n=>n.name==='A♭')&&I.some(n=>n.name==='G')).toBe(true);
+  });
 });
 
 describe('scheduler',()=>{
@@ -52,6 +63,12 @@ describe('scheduler',()=>{
     const p=makePlan(false);
     expect(p.blocks.length).toBeGreaterThanOrEqual(3);
     expect(p.blocks.reduce((a,b)=>a+b.min,0)).toBe(p.len);
+  });
+
+  it('backdoor drill arrives in the circle curriculum after the plain ii–V–I',()=>{
+    const first=k=>CURR.circle.findIndex(id=>id.startsWith(`cy:${k}:`));
+    expect(first('bdiiV')).toBeGreaterThan(first('iiV'));
+    expect(CURR.circle.filter(id=>id.startsWith('cy:bdiiV:')).length).toBe(12);
   });
 
   it('1–10 review scheduling',()=>{

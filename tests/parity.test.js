@@ -17,9 +17,15 @@ const W=ctx.__WS;
 const plain=x=>JSON.parse(JSON.stringify(x));
 const same=(a,b)=>expect(plain(a)).toEqual(plain(b));
 const KEYS=[...Array(12).keys()];
+// Items added since the port, which the prototype doesn't have: left out of the comparisons below.
+const ADDED=id=>id.startsWith('cy:bdiiV:');
+const without=o=>Object.fromEntries(Object.entries(o).filter(([id])=>!ADDED(id)));
 
 describe('port matches the prototype',()=>{
-  it('items and curricula',()=>{same(ITEMS,W.ITEMS);same(CURR,W.CURR);});
+  it('items and curricula',()=>{
+    same(without(ITEMS),W.ITEMS);
+    for(const d in CURR)same(CURR[d].filter(id=>!ADDED(id)),W.CURR[d]);
+  });
 
   it('chord spellings and two-hand voicings',()=>{for(const q in QUAL)for(const pc of KEYS)same(twoHand(q,pc),W.twoHand(q,pc));});
 
@@ -40,15 +46,19 @@ describe('port matches the prototype',()=>{
   });
 
   it('daily plans after the same run of reviews',()=>{
-    setState(defaults());W.setState(plain(defaults()));
-    same(makePlan(false),W.makePlan(false));
-    // A deterministic pseudo-random run of ratings across the catalogue.
-    let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
-    const ids=Object.keys(ITEMS);
-    for(let round=0;round<40;round++){
-      for(let n=0;n<8;n++){const id=ids[Math.floor(rnd()*ids.length)],r=1+Math.floor(rnd()*10),bpm=rnd()<.5?60+Math.floor(rnd()*80):null;review(id,r,bpm);W.review(id,r,bpm);}
-      same(state.items,W.state().items);
-      for(const len of [10,15,20,30]){state.settings.len=len;W.state().settings.len=len;same(makePlan(false),W.makePlan(false));}
-    }
+    // Plan with the prototype's circle curriculum, so new drills don't change which items come up.
+    const circle=CURR.circle.slice();CURR.circle=circle.filter(id=>!ADDED(id));
+    try{
+      setState(defaults());W.setState(plain(defaults()));
+      same(makePlan(false),W.makePlan(false));
+      // A deterministic pseudo-random run of ratings across the catalogue.
+      let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+      const ids=Object.keys(W.ITEMS);
+      for(let round=0;round<40;round++){
+        for(let n=0;n<8;n++){const id=ids[Math.floor(rnd()*ids.length)],r=1+Math.floor(rnd()*10),bpm=rnd()<.5?60+Math.floor(rnd()*80):null;review(id,r,bpm);W.review(id,r,bpm);}
+        same(state.items,W.state().items);
+        for(const len of [10,15,20,30]){state.settings.len=len;W.state().settings.len=len;same(makePlan(false),W.makePlan(false));}
+      }
+    }finally{CURR.circle=circle;}
   });
 });

@@ -22,7 +22,7 @@ for(let pc=0;pc<12;pc++)add({id:`rx:mix:${pc}`,domain:'progressions',type:'mix',
 diag('progressions',[['ext','sus','alt','tt'],['secdom','backdoor','miniv','minor'],['alldom','subii','ttturn','cycle'],['relii','dim','chromii','above'],['below','ladybird','coltrane']],[[0,5],[7,10],[2,3],[9,8],[4,1],[11,6]]);
 for(const c in CYC)for(let pc=0;pc<12;pc++)add({id:`cy:${c}:${pc}`,domain:'circle',type:'cycle',sub:c,key:pc,label:`${CYC[c].name} · ${keyName(pc,CYC[c].mode)}${CYC[c].mode==='min'?' minor':''}`});
 add({id:'cy:quiz',domain:'circle',type:'quiz',sub:'quiz',key:null,label:'Circle recall · 60 seconds'});
-diag('circle',[['dom7','diatmaj'],['guide','iiV'],['diatmin']],[[0,5,7,10],[2,3,9,8],[4,1,11,6]]);
+diag('circle',[['dom7','diatmaj'],['guide','iiV'],['diatmin','bdiiV']],[[0,5,7,10],[2,3,9,8],[4,1,11,6]]);
 ORDER_INTRO.forEach(pc=>CURR.progressions.push(`rx:mix:${pc}`));
 export const MIX_POOL=Object.keys(TECH).filter(k=>TECH[k].mode==='maj');
 export const MIX_NEED=4;
