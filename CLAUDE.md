@@ -28,7 +28,7 @@ Six practice areas ("domains"), each with items in all 12 keys:
 | Domain | id prefix | What it drills |
 |---|---|---|
 | Rhythm & time | `rh:`, `rd:` | Time-feel metronome modes (2 & 4, beat 4 only, bar on/off, etc.), subdivisions and polyrhythms, and tap-along rhythm reading scored against the grid |
-| Circle of 5ths | `cy:` | Dominant 7ths round the circle, guide tones down the circle, ii–V–I down the circle, diatonic cycle in major and minor; plus `cy:quiz`, a 60-second recall opener |
+| Circle of 5ths | `cy:` | Dominant 7ths round the circle, guide tones down the circle, ii–V–I and backdoor ii–V–I (iv–♭VII7–I) down the circle, diatonic cycle in major and minor; plus `cy:quiz`, a 60-second recall opener |
 | Scales & speed | `sc:` | 13 scales with per-item tempo ladders |
 | Patterns & lines | `pt:` | Digital patterns and an enclosure over a ii–V–I |
 | Chords & extensions | `ch:` | 25 chord qualities (maj9, 6/9, 13, sus, alt, 9♯11 …). Spell it, then play LH root + guide tone, RH colour tones |
@@ -53,7 +53,8 @@ Item ids are `<prefix>:<sub>:<pitch-class>` (pitch class 0 = C … 11 = B), exce
 - `spell(root, degree, semitones)` gives the correct letter name for a scale degree (so the 7th of G♭7 is F♭, the 3rd of B7 is D♯). Use it for everything. Never spell notes from a flat/sharp lookup table.
 - `QUAL` defines chord qualities: `tones` (full spelling as [degree, semitones]) and `four` (the four-note subset used for rootless/drop voicings).
 - `TECH` defines reharm techniques as `base` and `spice` arrays of bars. Each bar holds 1–2 chords `K(numeral, degree, semitones, quality, isNew)`. Base and spice must have the same number of bars (checked by a test).
-- `CYC` defines circle drills; `QZ` defines the recall question types.
+- `CYC` defines circle drills (those with a `prog` play that progression in each key, a 5th lower each time); `QZ` defines the recall question types.
+- `tests/parity.test.js` leaves items added since the port (`ADDED`) out of its comparisons with the prototype; add new item ids there.
 - Chord roots that would be spelt with a double accidental, F♭, C♭, E♯ or B♯ fall back to the simpler enharmonic (so E9♯11, not F♭9♯11).
 - `voiceTexture(chords, tex)` voice-leads a sequence in one of five textures: `guide` (3rds & 7ths), `shells` (LH root + guide tone, RH colour), `rootless`, `drop2`, `drop3`. It chooses, chord by chord, the candidate with the least top-weighted movement from the previous voicing.
 
@@ -73,6 +74,8 @@ Item ids are `<prefix>:<sub>:<pitch-class>` (pitch class 0 = C … 11 = B), exce
 
 ### Visual design
 Tokens are defined on `:root` with dark-mode overrides. Fonts: Big Shoulders Display (display), Instrument Sans (body) and IBM Plex Mono (data). Accent is a cobalt blue. Keep the existing look. The styles live in `src/styles.css`, unchanged from the prototype.
+
+Settings → Look also offers **Black & white** (`settings.look: 'mono'`, applied as `data-look="mono"` on `<html>`): white page, black ink, Helvetica, square corners, no colour. Where colour carried meaning it is replaced, not dropped: mastery squares fill from the bottom (¼ for 1–3 up to solid for 9–10), played keys get a solid name tag, quiz answers are solid (right) or struck through (wrong), and reading taps are solid / hollow / crossed squares. Any new colour-coded UI needs a black-and-white equivalent in the `[data-look="mono"]` block at the end of `styles.css`.
 
 ## Roadmap
 

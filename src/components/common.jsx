@@ -10,12 +10,17 @@ export const notesText=v=>v.map(n=>n.name).join(' ');
 const isBlack=pc=>[1,3,6,8,10].includes(pc);
 const KB_CSS='.kw{fill:var(--ivory);stroke:var(--line)}.kb{fill:var(--ebony)}.on{fill:var(--keyhi)}.kl{font:600 9px var(--f-mono);fill:var(--keylabel);text-anchor:middle}.kls{font-size:7px}.kc{font:500 7px var(--f-mono);fill:var(--muted);text-anchor:middle}';
 
-/* Two octaves (or more) of keyboard from the C below the lowest note, with the notes highlighted and named. */
-export function Keyboard({notes,cls}){const mids=notes.map(n=>n.midi);const lo=Math.min(...mids),hi=Math.max(...mids);const start=lo-((lo%12+12)%12);let end=start+24;while(end<=hi)end+=12;const W=20,H=84,BW=12,BH=52;const whites=[];for(let m=start;m<end;m++)if(!isBlack(m%12))whites.push(m);
+export const mono=()=>state.settings.look==='mono';
+
+/* Two octaves (or more) of keyboard from the C below the lowest note, with the notes highlighted and named.
+   In the black & white look the keys keep their colour and each played note gets a solid name tag instead. */
+
+export function Keyboard({notes,cls}){const sq=mono();const mids=notes.map(n=>n.midi);const lo=Math.min(...mids),hi=Math.max(...mids);const start=lo-((lo%12+12)%12);let end=start+24;while(end<=hi)end+=12;const W=20,H=84,BW=12,BH=52;const whites=[];for(let m=start;m<end;m++)if(!isBlack(m%12))whites.push(m);
   const on=new Map(notes.map(n=>[n.midi,n.name]));const wx={};const els=[];
-  whites.forEach((m,i)=>{wx[m]=i*W;const o=on.has(m);els.push(<rect key={'w'+m} x={i*W+.5} y=".5" width={W-1} height={H} rx="3" className={'kw'+(o?' on':'')}/>);
+  whites.forEach((m,i)=>{wx[m]=i*W;const o=on.has(m);els.push(<rect key={'w'+m} x={i*W+.5} y=".5" width={W-1} height={H} rx={sq?0:3} className={'kw'+(o?' on':'')}/>);
+    if(o&&sq)els.push(<rect key={'q'+m} x={i*W+2.5} y={H-19} width={W-5} height={14} className="kq"/>);
     if(o)els.push(<text key={'l'+m} x={i*W+W/2} y={H-8} className="kl">{on.get(m)}</text>);else if(m%12===0)els.push(<text key={'c'+m} x={i*W+W/2} y={H-8} className="kc">{`C${Math.floor(m/12)-1}`}</text>);});
-  for(let m=start;m<end;m++){if(!isBlack(m%12))continue;const x=wx[m-1]+W-BW/2;const o=on.has(m);els.push(<rect key={'b'+m} x={x} y=".5" width={BW} height={BH} rx="2" className={'kb'+(o?' on':'')}/>);if(o)els.push(<text key={'k'+m} x={x+BW/2} y={BH-7} className="kl kls">{on.get(m)}</text>);}
+  for(let m=start;m<end;m++){if(!isBlack(m%12))continue;const x=wx[m-1]+W-BW/2;const o=on.has(m);els.push(<rect key={'b'+m} x={x} y=".5" width={BW} height={BH} rx={sq?0:2} className={'kb'+(o?' on':'')}/>);if(o&&sq)els.push(<rect key={'r'+m} x={x+1.5} y={BH-17} width={BW-3} height={13} className="kq kqs"/>);if(o)els.push(<text key={'k'+m} x={x+BW/2} y={BH-7} className="kl kls">{on.get(m)}</text>);}
   const tw=whites.length*W+1;
   return <div className={'kb'+(cls?' '+cls:'')}><svg viewBox={`0 0 ${tw} ${H+1}`} role="img" aria-label={`Keyboard showing ${notes.map(n=>n.name).join(' ')}`}><style>{KB_CSS}</style>{els}</svg></div>;}
 

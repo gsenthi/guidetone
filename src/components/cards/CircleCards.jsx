@@ -44,11 +44,11 @@ export function CycleCard({it,b,s}){const I=ITEMS[it.id],X=CYC[I.sub],C=UI.card;
   if(X.bars){const bars=barsInKey(X.bars.map(c=>[c]),I.key,X.mode);chords=bars.flat();path=<>
     <div className="row"><NamesChip/><span className="hint">Tap a numeral to check its chord name.</span></div><BarsView bars={bars} id="d"/></>;}
   else{chords=cycleChain(I.sub,I.key);path=<>
-    <div className="cc"><div className="eyebrow">{I.sub==='iiV'?'Keys in order':'Chords in order'}</div><PathView labels={cyclePath(I.sub,I.key)}/></div>
+    <div className="cc"><div className="eyebrow">{X.prog?'Keys in order':'Chords in order'}</div><PathView labels={cyclePath(I.sub,I.key)}/></div>
     <div className="row"><button className="chip" aria-pressed={String(!!C.pathAll)} onClick={()=>{C.pathAll=!C.pathAll;render();}}>Show the whole path</button><span className="hint">Tap a ? to check the next step.</span></div></>;}
   const sv=voiceTexture(chords,C.tex);
   return <CardShell it={it} b={b} s={s} title={X.name} mid>
-    <div className="keysub" style={{marginTop:-8}}>{X.bars?`In ${keyName(I.key,X.mode)}${X.mode==='min'?' minor':' major'}`:`Starting from ${keyName(I.key,'maj')} · ${X.n} ${I.sub==='iiV'?'keys':'chords'} anticlockwise`}</div>
+    <div className="keysub" style={{marginTop:-8}}>{X.bars?`In ${keyName(I.key,X.mode)}${X.mode==='min'?' minor':' major'}`:`Starting from ${keyName(I.key,'maj')} · ${X.n} ${X.prog?'keys':'chords'} anticlockwise`}</div>
     <p className="instr">{X.how}</p>
     {path}
     <VoicingFold sf={chords} sv={sv} TL={TL}/><div className="row"><button className="btn" onClick={()=>hearSeq(chords,sv)}>Hear it</button></div>
